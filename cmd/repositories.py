@@ -1,6 +1,6 @@
 import os
 
-from exceptions import UserInputException, common_exceptions
+from exceptions import UserInputException
 
 
 class CMDRepositories:
@@ -36,12 +36,18 @@ class CMDRepositories:
     # cd 'directory' - go to 'directory'
     # cd '..' - go back one directory
     def change_directory(self, current_cd_command: str, new_directory: str) -> str:
-        common_exceptions(self.command(new_directory), current_cd_command, new_directory)
+        try:
+            os.chdir(new_directory)
+            self.start_directory = os.getcwd()
+        except FileNotFoundError:
+            print(f'{current_cd_command}: no such file or directory: {new_directory}')
+        except NotADirectoryError:
+            print(f'{current_cd_command}: not a directory: {new_directory}')
+        except PermissionError:
+            print(f'zsh: permission denied: {new_directory}')
+        except UserInputException as e:
+            print(e)
         return self.start_directory
-
-    def change_directory_command(self, new_directory):
-        os.chdir(new_directory)
-        self.start_directory = os.getcwd()
 
     """ ---------------------------------------------------------------------- """
 
